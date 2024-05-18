@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Statistics</title>
+    <link rel="stylesheet" type="text/css" href="/styles.css" />
+  </head>
+  <body>
+    <main>
+      <h1 class="break-all">/{{mask}}</h1>
+      <p class="break-all">
+        <span class="stat-label">Unreputable Link:</span>
+        &nbsp;
+        <a href="/{{mask}}" id="link"><span id="origin"></span>/{{mask}}</a>
+      </p>
+      <p class="break-all">
+        <span class="stat-label">Link Destination:</span>
+        &nbsp;
+        <a href="{{actual}}">{{actual}}</a>
+      </p>
+      <p>
+        <span class="stat-label">Hits:</span>
+        &nbsp;{{hits}}
+      </p>
+      <a href="/">New Link</a>
+    </main>
+    <script>
+      document.querySelector('#origin').innerText = location.origin;
+    </script>
+  </body>
+</html>

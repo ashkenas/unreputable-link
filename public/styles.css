@@ -1,0 +1,87 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: #202020;
+  color: #efefef;
+  font-family: Roboto, Arial, Helvetica, sans-serif;
+}
+main {
+  max-width: 600px;
+  margin: auto;
+  width: calc(100% - 2rem);
+}
+a {
+  color: #6dbbeb;
+  text-decoration-color: currentColor;
+}
+.break-all { word-break: break-all; }
+.stat-label {
+  font-weight: 500;
+  color: #bbbbbb;
+}
+form { font-size: inherit; }
+.error, .success {
+  display: none;
+  font-weight: 500;
+  font-size: .85rem;
+}
+.error { color: rgb(201, 85, 85); }
+label + .error { margin: 0; }
+.success { color: rgb(85, 201, 112); }
+.success a {
+  color: inherit;
+  text-decoration-color: currentColor;
+}
+.show { display: block; }
+label {
+  position: relative;
+  cursor: text;
+  display: block;
+  font-size: .85em;
+  color: #bbbbbb;
+  margin: 0;
+}
+input[type="text"] {
+  display: block;
+  position: relative;
+  width: 100%;
+  outline: none;
+  font-size: 1rem;
+  font-family: inherit;
+  background-color: transparent;
+  color: #efefef;
+  border: 1px solid #bbbbbb;
+}
+input[type="text"]:focus { border-color: #efefef; }
+input[type="submit"] {
+  display: block;
+  outline: none;
+  margin-top: 1.25rem;
+  padding: .25rem 1rem;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #bbbbbb;
+  background: transparent;
+  border: 1px solid #bbbbbb;
+}
+input[type="submit"]:hover, input[type="submit"]:focus {
+  background-color: #333333;
+  border-color: #efefef;
+}
+label:not(:first-child) { margin-top: 1rem; }
+label:has(+ .error.show) input { border-color: rgb(201, 85, 85); }
+input:disabled { opacity: 0.7; }
+* {
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+}
+@media (orientation: portrait) {
+  html {
+    font-size: 40px;
+  }
+  main {
+    max-width: calc(100% - 2rem);
+  }
+}

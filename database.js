@@ -88,16 +88,17 @@ export const createMaskedLink = async (mask, actual) => {
  * @returns {Promise<string|null>} The unmasked link, or null if it doesn't exist
  */
 export const resolveMask = async (mask) => {
+  mask = mask.toLowerCase();
   const { data, error } = await supabase
     .from('links')
     .select('actual,hits')
-    .eq('mask', mask.toLowerCase());
+    .eq('mask', mask);
   if (error) throw error;
   if (data && data.length) {
     try {
       await supabase.from('links')
         .update({ hits: data[0].hits + 1 })
-        .eq('mask');
+        .eq('mask', mask);
     } catch (e) {
       console.error(e);
     }
@@ -105,4 +106,18 @@ export const resolveMask = async (mask) => {
   } else {
     return null;
   }
+};
+
+/**
+ * Gets the info related to a mask.
+ * @param {string} mask The mask to lookup
+ * @returns {Promise<{actual:string;hits:number;}|null>} The unmasked link, or null if it doesn't exist
+ */
+export const getMaskInfo = async (mask) => {
+  const { data, error } = await supabase
+    .from('links')
+    .select('mask,actual,hits')
+    .eq('mask', mask.toLowerCase());
+  if (error) throw error;
+  return data && data.length ? data[0] : null;
 };
