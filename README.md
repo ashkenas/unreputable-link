@@ -1,5 +1,5 @@
 # Unreputable Link
-A lightweight URL lengthener with concerningly unreputable recommendations.
+A lightweight URL lengthener with concerningly unreputable recommendations. [Try it out!](https://unreputable.link/)
 
 ## Can I run my own version?
 Sure. I don't know why you'd want to, but sure.
