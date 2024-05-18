@@ -149,7 +149,7 @@
           let actualErrorMsg;
           if (actual.length > 512)
             actualErrorMsg = 'Please keep links to 512 characters maximum!';
-          if (!(/^(?:https?:\/\/)?(?:[a-z0-9_-]+\.)+[a-z]{2,}(?:\/*)?$/gi).test(actual))
+          if (!(/^(?:https?:\/\/)?(?:[a-z0-9_-]+\.)+[a-z]{2,}(?:\/.*)?$/gi).test(actual))
             actualErrorMsg = 'Invalid link!';
           if (actualErrorMsg) {
             actualError.classList.add('show');
