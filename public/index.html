@@ -15,55 +15,60 @@
       color: #efefef;
       font-family: Roboto, Arial, Helvetica, sans-serif;
     }
+    * {
+      -webkit-text-size-adjust: none;
+      text-size-adjust: none;
+    }
     main {
       max-width: 600px;
       margin: auto;
       width: calc(100% - 2rem);
     }
-    .error {
+    @media (orientation: portrait) {
+      html {
+        font-size: 40px;
+      }
+      main {
+        max-width: calc(100% - 2rem);
+      }
+    }
+    form { font-size: inherit; }
+    .error, .success {
       display: none;
-      color: rgb(201, 85, 85);
       font-weight: 500;
+      font-size: .85rem;
     }
-    label + .error {
-      margin: 0;
-    }
-    .success {
-      display: none;
-      color: rgb(85, 201, 112);
-      font-weight: 500;
-    }
+    .error { color: rgb(201, 85, 85); }
+    label + .error { margin: 0; }
+    .success { color: rgb(85, 201, 112); }
     .success a {
       color: inherit;
       text-decoration-color: currentColor;
     }
-    .show {
-      display: block;
-    }
+    .show { display: block; }
     label {
       position: relative;
       cursor: text;
       display: block;
-      font-size: .75em;
+      font-size: .85em;
       color: #bbbbbb;
       margin: 0;
     }
     input[type="text"] {
       display: block;
       position: relative;
-      padding: 0;
       width: 100%;
-      font-size: 0;
       outline: none;
       font-size: 1rem;
       font-family: inherit;
       background-color: transparent;
       color: #efefef;
-      border: none;
-      border-bottom: 1px solid #bbbbbb;
+      border: 1px solid #bbbbbb;
     }
+    input[type="text"]:focus { border-color: #efefef; }
     input[type="submit"] {
       display: block;
+      outline: none;
       margin-top: 1.25rem;
       padding: .25rem 1rem;
       font-family: inherit;
@@ -73,18 +78,13 @@
       background: transparent;
       border: 1px solid #bbbbbb;
     }
-    input[type="submit"]:hover {
+    input[type="submit"]:hover, input[type="submit"]:focus {
       background-color: #333333;
+      border-color: #efefef;
     }
-    label:not(:first-child) {
-      margin-top: 1rem;
-    }
-    label:has(+ .error.show) input {
-      border-color: rgb(201, 85, 85);
-    }
-    input:disabled {
-      opacity: 0.7;
-    }
+    label:not(:first-child) { margin-top: 1rem; }
+    label:has(+ .error.show) input { border-color: rgb(201, 85, 85); }
+    input:disabled { opacity: 0.7; }
   </style>
   <body>
     <main>
@@ -122,6 +122,43 @@
       const serverSuccess = document.querySelector('#server-success');
       const serverSuccessLink = document.querySelector('#server-success a');
       const submitButton = document.querySelector('input[type="submit"]');
+      // This validation happens server-side and in the db as well, don't bother
+      const validateMask = () => {
+        const mask = maskInput.value.trim().toLowerCase();
+        let maskErrorMsg;
+        if (mask.length < 6)
+          maskErrorMsg = 'Unreputable links should be at least 6 characters.';
+        if (mask.length > 512)
+          maskErrorMsg = 'Please keep links to 512 characters maximum!';
+        if ((/[^a-z0-9._-]/g).test(mask))
+          maskErrorMsg = 'Unreputable link can only have alphanumeric characters, hypens, and underscores.';
+        if (maskErrorMsg) {
+          maskError.classList.add('show');
+          maskError.innerText = maskErrorMsg;
+          return null;
+        } else {
+          maskError.classList.remove('show');
+          return mask;
+        }
+      };
+      const validateActual = () => {
+        const actual = actualInput.value.trim();
+        let actualErrorMsg;
+        if (actual.length > 512)
+          actualErrorMsg = 'Please keep links to 512 characters maximum!';
+        if (!(/^(?:https?:\/\/)?(?:[a-z0-9_-]+\.)+[a-z]{2,}(?:\/.*)?$/gi).test(actual))
+          actualErrorMsg = 'Invalid link!';
+        if (actualErrorMsg) {
+          actualError.classList.add('show');
+          actualError.innerText = actualErrorMsg;
+          return null;
+        } else {
+          actualError.classList.remove('show');
+          return actual;
+        }
+      };
+      maskInput.addEventListener('input', validateMask);
+      actualInput.addEventListener('input', validateActual);
       let debounce = false;
       document.querySelector('form').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -131,33 +168,9 @@
         await (async () => {
           serverError.classList.remove('show');
           serverSuccess.classList.remove('show');
-          const mask = maskInput.value.trim().toLowerCase();
-          let maskErrorMsg;
-          if (mask.length < 6)
-            maskErrorMsg = 'Unreputable links should be at least 6 characters.';
-          if (mask.length > 512)
-            maskErrorMsg = 'Please keep links to 512 characters maximum!';
-          if ((/[^a-z0-9._-]/g).test(mask))
-            maskErrorMsg = 'Unreputable link can only have alphanumeric characters, hypens, and underscores.';
-          if (maskErrorMsg) {
-            maskError.classList.add('show');
-            maskError.innerText = maskErrorMsg;
-          } else {
-            maskError.classList.remove('show');
-          }
-          const actual = actualInput.value.trim();
-          let actualErrorMsg;
-          if (actual.length > 512)
-            actualErrorMsg = 'Please keep links to 512 characters maximum!';
-          if (!(/^(?:https?:\/\/)?(?:[a-z0-9_-]+\.)+[a-z]{2,}(?:\/.*)?$/gi).test(actual))
-            actualErrorMsg = 'Invalid link!';
-          if (actualErrorMsg) {
-            actualError.classList.add('show');
-            actualError.innerText = actualErrorMsg;
-          } else {
-            actualError.classList.remove('show');
-          }
-          if (maskErrorMsg || actualErrorMsg) return;
+          const mask = validateMask();
+          const actual = validateActual();
+          if (!mask || !actual) return;
           try {
             const res = await fetch('/', {
               method: 'POST',
