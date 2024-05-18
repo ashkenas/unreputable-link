@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Unreputable Link</title>
+  </head>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+  </style>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: #202020;
+      color: #efefef;
+      font-family: Roboto, Arial, Helvetica, sans-serif;
+    }
+    main {
+      max-width: 600px;
+      margin: auto;
+      width: calc(100% - 2rem);
+    }
+    .error {
+      display: none;
+      color: rgb(201, 85, 85);
+      font-weight: 500;
+    }
+    label + .error {
+      margin: 0;
+    }
+    .success {
+      display: none;
+      color: rgb(85, 201, 112);
+      font-weight: 500;
+    }
+    .success a {
+      color: inherit;
+      text-decoration-color: currentColor;
+    }
+    .show {
+      display: block;
+    }
+    label {
+      position: relative;
+      cursor: text;
+      display: block;
+      font-size: .75em;
+      color: #bbbbbb;
+      margin: 0;
+    }
+    input[type="text"] {
+      display: block;
+      position: relative;
+      padding: 0;
+      width: 100%;
+      font-size: 0;
+      outline: none;
+      font-size: 1rem;
+      font-family: inherit;
+      background-color: transparent;
+      color: #efefef;
+      border: none;
+      border-bottom: 1px solid #bbbbbb;
+    }
+    input[type="submit"] {
+      display: block;
+      margin-top: 1.25rem;
+      padding: .25rem 1rem;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #bbbbbb;
+      background: transparent;
+      border: 1px solid #bbbbbb;
+    }
+    input[type="submit"]:hover {
+      background-color: #333333;
+    }
+    label:not(:first-child) {
+      margin-top: 1rem;
+    }
+    label:has(+ .error.show) input {
+      border-color: rgb(201, 85, 85);
+    }
+    input:disabled {
+      opacity: 0.7;
+    }
+  </style>
+  <body>
+    <main>
+      <h1>Unreputable Link</h1>
+      <p>
+        Want to concern your friends? Give HR a heart attack? Cause discomfort
+        wherever you go? If you answered yes to any of these desires, than this
+        is the URL lengthener for you!
+      </p>
+      <form>
+        <label>
+          Actual Link
+          <input name="actual" id="actual" type="text" placeholder=" "/>
+        </label>
+        <p id="actual-error" class="error"></p>
+        <label>
+          Unreputable Link
+          <input name="mask" id="mask" type="text" placeholder=" "/>
+        </label>
+        <p id="mask-error" class="error"></p>
+        <input type="submit" value="Create Unreputable Link"/>
+        <p id="server-success" class="success">
+          <a target="_blank"></a>
+          &nbsp;created successfully!
+        </p>
+        <p id="server-error" class="error"></p>
+      </form>
+    </main>
+    <script>
+      const maskInput = document.querySelector('#mask');
+      const actualInput = document.querySelector('#actual');
+      const maskError = document.querySelector('#mask-error');
+      const actualError = document.querySelector('#actual-error');
+      const serverError = document.querySelector('#server-error');
+      const serverSuccess = document.querySelector('#server-success');
+      const serverSuccessLink = document.querySelector('#server-success a');
+      const submitButton = document.querySelector('input[type="submit"]');
+      let debounce = false;
+      document.querySelector('form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (debounce) return;
+        debounce = true;
+        submitButton.disabled = true;
+        await (async () => {
+          serverError.classList.remove('show');
+          serverSuccess.classList.remove('show');
+          const mask = maskInput.value.trim().toLowerCase();
+          let maskErrorMsg;
+          if (mask.length < 6)
+            maskErrorMsg = 'Unreputable links should be at least 6 characters.';
+          if (mask.length > 512)
+            maskErrorMsg = 'Please keep links to 512 characters maximum!';
+          if ((/[^a-z0-9_-]/g).test(mask))
+            maskErrorMsg = 'Unreputable link can only have alphanumeric characters, hypens, and underscores.';
+          if (maskErrorMsg) {
+            maskError.classList.add('show');
+            maskError.innerText = maskErrorMsg;
+          } else {
+            maskError.classList.remove('show');
+          }
+          const actual = actualInput.value.trim();
+          let actualErrorMsg;
+          if (actual.length > 512)
+            actualErrorMsg = 'Please keep links to 512 characters maximum!';
+          if (!(/^(?:https?:\/\/)?(?:[a-z0-9_-]+\.)+[a-z]{2,}(?:\/*)?$/gi).test(actual))
+            actualErrorMsg = 'Invalid link!';
+          if (actualErrorMsg) {
+            actualError.classList.add('show');
+            actualError.innerText = actualErrorMsg;
+          } else {
+            actualError.classList.remove('show');
+          }
+          if (maskErrorMsg || actualErrorMsg) return;
+          try {
+            const res = await fetch('/', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ mask, actual })
+            });
+            if (!res.ok) {
+              serverError.classList.add('show');
+              serverSuccess.classList.remove('show');
+              serverError.innerText = (await res.json()).error;
+            } else {
+              serverError.classList.remove('show');
+              serverSuccess.classList.add('show');
+              serverSuccessLink.href =
+                serverSuccessLink.innerText = `${location.origin}/${mask}`;
+            }
+          } catch (e) {
+            serverError.classList.add('show');
+            serverSuccess.classList.remove('show');
+            serverError.innerText = 
+              'Failed to contact server, please check your internet connection.';
+          }
+        })();
+        debounce = false;
+        submitButton.disabled = false;
+      });
+    </script>
+  </body>
+</html>
