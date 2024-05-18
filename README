@@ -14,7 +14,8 @@ Sure. I don't know why you'd want to, but sure.
 
 ### Installation
 1. Clone this repository
-2. Create a `.env` file at the repository root and add the following two variables:
+2. Create a `.env` file at the repository root and add the following variables:
   - `SUPABASE_URL` - The Project URL for your Supabase project
   - `SUPABASE_ROLE_KEY` - The Service Role API Key for your project
+  - `HOST` - The host where this server is accessible
 3. Run `npm start` in the repository root

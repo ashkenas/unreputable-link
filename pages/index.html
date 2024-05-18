@@ -3,6 +3,8 @@
   <head>
     <meta charset="utf-8">
     <title>Unreputable Link</title>
+    <meta name="description" content="You know you want to click it.">
+    <meta name="theme" content="#efefef">
   </head>
   <link rel="stylesheet" type="text/css" href="/styles.css" />
   <body>
@@ -65,8 +67,11 @@
         let actualErrorMsg;
         if (actual.length > 512)
           actualErrorMsg = 'Please keep links to 512 characters maximum!';
-        if (!(/^(?:https?:\/\/)?(?:[a-z0-9_-]+\.)+[a-z]{2,}(?:\/.*)?$/gi).test(actual))
+        const isLinkValid = (/^(?:https?:\/\/)?((?:[a-z0-9_-]+\.)+[a-z]{2,})(?:\/.*)?$/gi).exec(actual);
+        if (!isLinkValid) {
           actualErrorMsg = 'Invalid link!';
+        } else if (isLinkValid[1] && isLinkValid[1].endsWith(location.hostname))
+          actualErrorMsg = 'Cannot link to another unreputable link!';
         if (actualErrorMsg) {
           actualError.classList.add('show');
           actualError.innerText = actualErrorMsg;

@@ -44,8 +44,10 @@ const requireValidLink = (link) => {
     throw new StatusError(400, 'Please provide a valid link.');
   if (link.length > 512)
     throw new StatusError(400, 'Please keep links to 512 characters maximum!');
-  const isLinkValid = (/^(?:https?:\/\/)?(?:[a-z0-9_-]+\.)+[a-z]{2,}(?:\/.*)?$/gi).test(link);
+  const isLinkValid = (/^(?:https?:\/\/)?((?:[a-z0-9_-]+\.)+[a-z]{2,})(?:\/.*)?$/gi).exec(link);
   if (!isLinkValid) throw new StatusError(400, 'Invalid link!');
+  if (isLinkValid[1] && isLinkValid[1].endsWith(process.env.HOST))
+    throw new StatusError(400, 'Cannot link to another unreputable link!');
 };
 
 /**
