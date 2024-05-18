@@ -30,7 +30,7 @@ const requireValidMask = (mask) => {
     throw new StatusError(400, 'Links should be at least 6 characters');
   if (mask.length > 512)
     throw new StatusError(400, 'Please keep links to 512 characters maximum!');
-  const invalidMask = (/[^a-z0-9_-]/g).test(mask);
+  const invalidMask = (/[^a-z0-9._-]/g).test(mask);
   if (invalidMask) throw new StatusError(400, 'Invalid mask!');
   return mask;
 };

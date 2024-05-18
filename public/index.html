@@ -137,7 +137,7 @@
             maskErrorMsg = 'Unreputable links should be at least 6 characters.';
           if (mask.length > 512)
             maskErrorMsg = 'Please keep links to 512 characters maximum!';
-          if ((/[^a-z0-9_-]/g).test(mask))
+          if ((/[^a-z0-9._-]/g).test(mask))
             maskErrorMsg = 'Unreputable link can only have alphanumeric characters, hypens, and underscores.';
           if (maskErrorMsg) {
             maskError.classList.add('show');
